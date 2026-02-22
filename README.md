@@ -112,6 +112,8 @@ Add your Cloudflare domain to Firebase:
 
 ## iOS App Setup
 
+> **Note:** The `ios/` and `android/` folders are NOT included in the repository for security reasons. They contain `GoogleService-Info.plist` (iOS) and `google-services.json` (Android) which have Firebase API keys. Each developer must generate these folders locally.
+
 ### Prerequisites
 
 - macOS with Xcode installed
@@ -124,6 +126,8 @@ Add your Cloudflare domain to Firebase:
 npm run build
 npx cap add ios
 ```
+
+This creates the `ios/` folder locally on your machine.
 
 ### Step 2: Configure Google Sign-In for iOS
 
