@@ -1,5 +1,6 @@
-import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom'
+import { HashRouter, BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { Capacitor } from '@capacitor/core'
 import Login from './pages/Login'
 import Entry from './pages/Entry'
 import Transactions from './pages/Transactions'
@@ -7,24 +8,24 @@ import Stats from './pages/Stats'
 import Settings from './pages/Settings'
 import Family from './pages/Family'
 
+// Use HashRouter for mobile (file:// protocol), BrowserRouter for web
+const Router = Capacitor.isNativePlatform() ? HashRouter : BrowserRouter
+
 function Navigation() {
   const { user, logout } = useAuth()
 
   return (
     <nav className="nav">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-        <h2 style={{ color: '#4f46e5' }}>💰 Money Manager</h2>
-        <div className="nav-links">
-          <NavLink to="/entry" className={({ isActive }) => isActive ? 'active' : ''}>Add Entry</NavLink>
-          <NavLink to="/transactions" className={({ isActive }) => isActive ? 'active' : ''}>Transactions</NavLink>
-          <NavLink to="/stats" className={({ isActive }) => isActive ? 'active' : ''}>Stats</NavLink>
-          <NavLink to="/family" className={({ isActive }) => isActive ? 'active' : ''}>Family</NavLink>
-          <NavLink to="/settings" className={({ isActive }) => isActive ? 'active' : ''}>Settings</NavLink>
-        </div>
+      <div className="nav-header">
+        <h2 style={{ color: '#4f46e5', fontSize: '18px' }}>💰 Money Manager</h2>
+        <button className="btn" onClick={logout} style={{ padding: '6px 12px', fontSize: '12px', background: '#f3f4f6', color: '#374151' }}>Logout</button>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <span style={{ color: '#6b7280' }}>{user?.email}</span>
-        <button className="btn" onClick={logout} style={{ padding: '8px 16px' }}>Logout</button>
+      <div className="nav-links">
+        <NavLink to="/entry" className={({ isActive }) => isActive ? 'active' : ''}>Entry</NavLink>
+        <NavLink to="/transactions" className={({ isActive }) => isActive ? 'active' : ''}>Transactions</NavLink>
+        <NavLink to="/stats" className={({ isActive }) => isActive ? 'active' : ''}>Stats</NavLink>
+        <NavLink to="/family" className={({ isActive }) => isActive ? 'active' : ''}>Family</NavLink>
+        <NavLink to="/settings" className={({ isActive }) => isActive ? 'active' : ''}>Settings</NavLink>
       </div>
     </nav>
   )
@@ -56,7 +57,7 @@ function PublicRoute({ children }) {
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <Router>
         <Routes>
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/entry" element={<PrivateRoute><Entry /></PrivateRoute>} />
@@ -66,7 +67,7 @@ function App() {
           <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
           <Route path="*" element={<Navigate to="/entry" replace />} />
         </Routes>
-      </BrowserRouter>
+      </Router>
     </AuthProvider>
   )
 }

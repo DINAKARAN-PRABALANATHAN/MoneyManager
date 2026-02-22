@@ -1,10 +1,12 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
 import { auth, googleProvider } from '../firebase'
 import { 
-  signInWithPopup, signOut, onAuthStateChanged,
+  signInWithPopup, signInWithCredential, signOut, onAuthStateChanged,
   createUserWithEmailAndPassword, signInWithEmailAndPassword,
   updateProfile, GoogleAuthProvider, reauthenticateWithPopup
 } from 'firebase/auth'
+import { Capacitor } from '@capacitor/core'
+import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth'
 
 const AuthContext = createContext(null)
 
@@ -16,34 +18,91 @@ export const useAuth = () => {
   return context
 }
 
+// Check if running on native mobile
+const isNative = Capacitor.isNativePlatform()
+
+// Initialize Google Auth for native
+if (isNative) {
+  GoogleAuth.initialize({
+    clientId: '941221002278-n2mtpb20hcd1lvr9mfjb1u3pv244mad1.apps.googleusercontent.com',
+    serverClientId: '941221002278-35tkbeipm2rn7aeps8gv8s24tl2oo5p7.apps.googleusercontent.com',
+    scopes: ['profile', 'email', 'https://www.googleapis.com/auth/drive.file'],
+    grantOfflineAccess: true
+  })
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [accessToken, setAccessToken] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let timeoutId
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      clearTimeout(timeoutId)
       setUser(user)
       setLoading(false)
-      // Clear token when user changes (security)
       if (!user) {
         setAccessToken(null)
         sessionStorage.removeItem('driveToken')
       }
+    }, (error) => {
+      console.error('Auth state error:', error)
+      setLoading(false)
     })
-    return unsubscribe
+    
+    timeoutId = setTimeout(() => {
+      console.log('Auth timeout - proceeding without auth')
+      setLoading(false)
+    }, 5000)
+    
+    return () => {
+      unsubscribe()
+      clearTimeout(timeoutId)
+    }
   }, [])
 
   const loginWithGoogle = useCallback(async () => {
     try {
-      const result = await signInWithPopup(auth, googleProvider)
-      const credential = GoogleAuthProvider.credentialFromResult(result)
-      if (credential?.accessToken) {
-        setAccessToken(credential.accessToken)
-        sessionStorage.setItem('driveToken', credential.accessToken)
+      if (isNative) {
+        // Native Google Sign-In
+        const googleUser = await GoogleAuth.signIn()
+        console.log('Google user:', JSON.stringify(googleUser))
+        
+        // Create Firebase credential from Google ID token
+        const idToken = googleUser.authentication.idToken
+        if (!idToken) {
+          throw new Error('No ID token received from Google')
+        }
+        
+        console.log('Creating Firebase credential with idToken...')
+        const credential = GoogleAuthProvider.credential(idToken)
+        
+        console.log('Calling signInWithCredential...')
+        try {
+          const result = await signInWithCredential(auth, credential)
+          console.log('Firebase sign in success:', result.user.email)
+        } catch (firebaseError) {
+          console.error('Firebase signInWithCredential error:', firebaseError.code, firebaseError.message)
+          throw firebaseError
+        }
+        
+        // Store access token for Google Drive
+        if (googleUser.authentication.accessToken) {
+          setAccessToken(googleUser.authentication.accessToken)
+          sessionStorage.setItem('driveToken', googleUser.authentication.accessToken)
+        }
+      } else {
+        // Web Google Sign-In with popup
+        const result = await signInWithPopup(auth, googleProvider)
+        const credential = GoogleAuthProvider.credentialFromResult(result)
+        if (credential?.accessToken) {
+          setAccessToken(credential.accessToken)
+          sessionStorage.setItem('driveToken', credential.accessToken)
+        }
       }
     } catch (error) {
-      console.error('Login error:', error)
+      console.error('Login error:', error.message, error.code, error)
       throw error
     }
   }, [])

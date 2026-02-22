@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app'
-import { getAuth, GoogleAuthProvider } from 'firebase/auth'
+import { getAuth, GoogleAuthProvider, initializeAuth, indexedDBLocalPersistence } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
+import { Capacitor } from '@capacitor/core'
 
 // Firebase config from environment variables
 const firebaseConfig = {
@@ -13,7 +14,11 @@ const firebaseConfig = {
 }
 
 const app = initializeApp(firebaseConfig)
-export const auth = getAuth(app)
+
+// Use different auth initialization for native vs web
+export const auth = Capacitor.isNativePlatform()
+  ? initializeAuth(app, { persistence: indexedDBLocalPersistence })
+  : getAuth(app)
 
 // Add Drive scope to access Google Drive
 export const googleProvider = new GoogleAuthProvider()

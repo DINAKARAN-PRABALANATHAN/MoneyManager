@@ -61,10 +61,13 @@ export default function Login() {
     setLoading(true)
     try {
       await loginWithGoogle()
+      // If we get here, login succeeded but auth state might not have updated yet
+      console.log('Google login completed')
     } catch (err) {
-      setError(getErrorMessage(err.code))
+      console.error('Google login error in Login.jsx:', err)
+      setError(err.message || getErrorMessage(err.code))
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (

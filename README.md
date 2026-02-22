@@ -1,6 +1,6 @@
 # 💰 Money Manager
 
-A personal finance tracking web app built with React and Firebase.
+A personal finance tracking app built with React and Firebase, available on Web and iOS.
 
 ## Features
 
@@ -19,6 +19,7 @@ A personal finance tracking web app built with React and Firebase.
 - Cloud Firestore
 - Google Drive API
 - Chart.js
+- Capacitor (iOS/Android)
 
 ## Setup
 
@@ -62,7 +63,7 @@ VITE_FIREBASE_APP_ID=your_app_id
 npm run dev
 ```
 
-## Deployment (Cloudflare Pages)
+## Web Deployment (Cloudflare Pages)
 
 ### Step 1: Push to GitHub
 
@@ -109,25 +110,89 @@ Add your Cloudflare domain to Firebase:
 2. **Authorized domains** → **Add domain**
 3. Add: `your-project.pages.dev`
 
+## iOS App Setup
+
+### Prerequisites
+
+- macOS with Xcode installed
+- Apple Developer account (free or paid)
+- iPhone connected via USB
+
+### Step 1: Add iOS Platform
+
+```bash
+npm run build
+npx cap add ios
+```
+
+### Step 2: Configure Google Sign-In for iOS
+
+1. Go to [Firebase Console](https://console.firebase.google.com) → Your project
+2. Add an iOS app with your Bundle ID (e.g., `com.yourname.moneymanager`)
+3. Download `GoogleService-Info.plist`
+4. Copy it to `ios/App/App/GoogleService-Info.plist`
+
+### Step 3: Add URL Schemes
+
+In `ios/App/App/Info.plist`, add URL schemes for Google Sign-In:
+- iOS Client ID (reversed): `com.googleusercontent.apps.YOUR_IOS_CLIENT_ID`
+- Web Client ID (reversed): `com.googleusercontent.apps.YOUR_WEB_CLIENT_ID`
+
+### Step 4: Build and Run
+
+```bash
+npx cap sync ios
+npx cap open ios
+```
+
+In Xcode:
+1. Select your iPhone from the device dropdown
+2. Set your Team in **Signing & Capabilities**
+3. Click **Play** to build and install
+
+### Sharing with Family (without App Store)
+
+**Option 1: Direct Install via Xcode**
+- Connect each family member's iPhone to your Mac
+- Run the app from Xcode
+- App expires after 7 days (free account) or 1 year (paid account)
+
+**Option 2: TestFlight (requires $99/year Apple Developer account)**
+- Archive the app in Xcode
+- Upload to App Store Connect
+- Invite family via TestFlight
+
 ## Project Structure
 
 ```
-src/
-├── context/
-│   └── AuthContext.jsx    # Authentication state
-├── hooks/
-│   ├── useFamily.js       # Family sharing logic
-│   └── useTransactions.js # Transaction CRUD
-├── pages/
-│   ├── Entry.jsx          # Add transactions
-│   ├── Transactions.jsx   # View/edit transactions
-│   ├── Stats.jsx          # Charts & statistics
-│   ├── Family.jsx         # Family management
-│   ├── Settings.jsx       # Categories & accounts
-│   └── Login.jsx          # Authentication
-├── firebase.js            # Firebase config
-└── App.jsx                # Routes & navigation
+├── src/
+│   ├── context/
+│   │   └── AuthContext.jsx    # Authentication state
+│   ├── hooks/
+│   │   ├── useFamily.js       # Family sharing logic
+│   │   └── useTransactions.js # Transaction CRUD
+│   ├── pages/
+│   │   ├── Entry.jsx          # Add transactions
+│   │   ├── Transactions.jsx   # View/edit transactions
+│   │   ├── Stats.jsx          # Charts & statistics
+│   │   ├── Family.jsx         # Family management
+│   │   ├── Settings.jsx       # Categories & accounts
+│   │   └── Login.jsx          # Authentication
+│   ├── firebase.js            # Firebase config
+│   └── App.jsx                # Routes & navigation
+├── ios/                       # iOS native project
+├── capacitor.config.json      # Capacitor config
+└── firestore.rules            # Firestore security rules
 ```
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run ios` | Build and open iOS project |
+| `npm run mobile:sync` | Sync web changes to mobile |
 
 ## License
 

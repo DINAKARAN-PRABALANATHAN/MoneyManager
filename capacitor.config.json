@@ -1,0 +1,20 @@
+{
+  "appId": "com.moneymanagerapp.app",
+  "appName": "Money Manager",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#4f46e5"
+    },
+    "GoogleAuth": {
+      "scopes": ["profile", "email", "https://www.googleapis.com/auth/drive.file"],
+      "clientId": "941221002278-n2mtpb20hcd1lvr9mfjb1u3pv244mad1.apps.googleusercontent.com",
+      "serverClientId": "941221002278-35tkbeipm2rn7aeps8gv8s24tl2oo5p7.apps.googleusercontent.com",
+      "forceCodeForRefreshToken": true
+    }
+  }
+}
