@@ -62,12 +62,52 @@ VITE_FIREBASE_APP_ID=your_app_id
 npm run dev
 ```
 
-## Deployment (Vercel)
+## Deployment (Cloudflare Pages)
 
-1. Push code to GitHub
-2. Import repo in [Vercel](https://vercel.com)
-3. Add environment variables in Vercel dashboard
-4. Deploy
+### Step 1: Push to GitHub
+
+```bash
+git add .
+git commit -m "Initial commit"
+git push origin main
+```
+
+### Step 2: Create Cloudflare Pages Project
+
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com)
+2. Click **Workers & Pages** → **Create** → **Pages** tab
+3. Click **Connect to Git** and select your repository
+
+### Step 3: Configure Build Settings
+
+| Setting | Value |
+|---------|-------|
+| Framework preset | Vite |
+| Build command | `npm run build` |
+| Build output directory | `dist` |
+
+### Step 4: Add Environment Variables
+
+Add these in **Settings** → **Environment variables**:
+
+- `VITE_FIREBASE_API_KEY`
+- `VITE_FIREBASE_AUTH_DOMAIN`
+- `VITE_FIREBASE_PROJECT_ID`
+- `VITE_FIREBASE_STORAGE_BUCKET`
+- `VITE_FIREBASE_MESSAGING_SENDER_ID`
+- `VITE_FIREBASE_APP_ID`
+
+### Step 5: Deploy
+
+Click **Save and Deploy**. Your site will be live at `your-project.pages.dev`
+
+### Step 6: Update Firebase Auth
+
+Add your Cloudflare domain to Firebase:
+
+1. Firebase Console → **Authentication** → **Settings**
+2. **Authorized domains** → **Add domain**
+3. Add: `your-project.pages.dev`
 
 ## Project Structure
 
