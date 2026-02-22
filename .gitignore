@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Environment variables (IMPORTANT - contains secrets)
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Firebase
+.firebase/
+firebase-debug.log

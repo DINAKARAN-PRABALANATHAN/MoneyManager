@@ -1,0 +1,54 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper: Check if user is authenticated
+    function isAuth() {
+      return request.auth != null;
+    }
+    
+    // Transactions - owner can do anything, family members can READ
+    match /transactions/{docId} {
+      allow read: if isAuth();
+      allow create: if isAuth() && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if isAuth() && request.auth.uid == resource.data.userId;
+    }
+    
+    // Categories - shared globally, users add themselves to userIds array
+    match /categories/{docId} {
+      // Anyone can read (to see available categories)
+      allow read: if isAuth();
+      // Anyone can create new categories
+      allow create: if isAuth();
+      // Anyone can update (to add/remove themselves from userIds)
+      allow update: if isAuth();
+      // Only creator can delete
+      allow delete: if isAuth() && request.auth.uid == resource.data.createdBy;
+    }
+    
+    // Accounts - shared globally, users add themselves to userIds array
+    match /accounts/{docId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth();
+      allow delete: if isAuth() && request.auth.uid == resource.data.createdBy;
+    }
+    
+    // Families
+    match /families/{familyId} {
+      allow read: if isAuth();
+      allow create: if isAuth() && request.auth.uid == request.resource.data.ownerId;
+      allow update: if isAuth();
+      allow delete: if isAuth() && request.auth.uid == resource.data.ownerId;
+    }
+    
+    // Family Invites
+    match /familyInvites/{inviteId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth();
+      allow delete: if isAuth() && request.auth.uid == resource.data.inviterId;
+    }
+  }
+}
