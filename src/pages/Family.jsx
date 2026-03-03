@@ -70,13 +70,37 @@ export default function Family() {
     showMessage('Code copied to clipboard!')
   }
 
-  const shareCode = () => {
-    const text = `Join my family "${family.name}" on Money Manager!\n\nUse this code: ${generatedCode}\n\nDownload the app and enter this code to join.`
+  const shareCode = async () => {
+    const text = `Join my family "${family.name}" on Money Manager!
+
+Use this code: ${generatedCode}
+
+📱 Download the app:
+• Android APK: https://drive.google.com/drive/folders/1DqKWMS0ms68HXJojAGEgENYBRsfAaIq9?usp=drive_link
+• Web App: https://moneymanager-1v0.pages.dev/login
+
+Enter the code above to join our family and share expenses!`
+    
+    // Copy to clipboard first (works everywhere)
+    try {
+      await navigator.clipboard.writeText(text)
+    } catch (e) {
+      // Fallback for older browsers
+    }
+    
+    // Try native share if available
     if (navigator.share) {
-      navigator.share({ title: 'Family Invite', text })
+      try {
+        await navigator.share({ 
+          title: 'Money Manager - Family Invite',
+          text: text
+        })
+      } catch (e) {
+        // User cancelled or share failed, but clipboard already has it
+        showMessage('Invite message copied to clipboard!')
+      }
     } else {
-      navigator.clipboard.writeText(text)
-      showMessage('Invite message copied!')
+      showMessage('Invite message copied to clipboard!')
     }
   }
 

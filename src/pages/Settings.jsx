@@ -200,6 +200,53 @@ export default function Settings() {
           </div>
         </div>
 
+        {/* Share App Section */}
+        <div style={{ padding: 16, background: '#eff6ff', borderRadius: 8, border: '1px solid #93c5fd', marginBottom: 16 }}>
+          <h4 style={{ margin: '0 0 8px 0', color: '#1e40af' }}>📤 Share App</h4>
+          <p style={{ margin: '0 0 12px 0', color: '#3b82f6', fontSize: 14 }}>
+            Share Money Manager with your family members
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
+            <a 
+              href="https://drive.google.com/drive/folders/1DqKWMS0ms68HXJojAGEgENYBRsfAaIq9?usp=drive_link" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', background: '#dcfce7', borderRadius: 8, color: '#166534', textDecoration: 'none', fontWeight: 500 }}
+            >
+              🤖 Android APK Download
+            </a>
+            <a 
+              href="https://moneymanager-1v0.pages.dev/login" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', background: '#dbeafe', borderRadius: 8, color: '#1e40af', textDecoration: 'none', fontWeight: 500 }}
+            >
+              🌐 Web App Link
+            </a>
+          </div>
+          <button 
+            className="btn btn-primary" 
+            onClick={() => {
+              const text = `📱 Download Money Manager:
+
+• Android APK: https://drive.google.com/drive/folders/1DqKWMS0ms68HXJojAGEgENYBRsfAaIq9?usp=drive_link
+• Web App: https://moneymanager-1v0.pages.dev/login
+
+Track expenses together with family!`
+              if (navigator.share) {
+                navigator.share({ title: 'Money Manager', text })
+              } else {
+                navigator.clipboard.writeText(text)
+                setMessage({ text: 'Links copied to clipboard!', isError: false })
+                setTimeout(() => setMessage(''), 2000)
+              }
+            }}
+            style={{ width: '100%' }}
+          >
+            📋 Copy Share Links
+          </button>
+        </div>
+
         {!isGoogleUser && (
           <div style={{ padding: 16, background: '#fffbeb', borderRadius: 8, border: '1px solid #fcd34d', marginBottom: 16 }}>
             <h4 style={{ margin: '0 0 8px 0', color: '#92400e' }}>📎 Enable Attachments</h4>
